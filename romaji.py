@@ -6,9 +6,6 @@ class Romaji:
     character_file = "characters.json"
     word_file = "words.json"
 
-    # 0 for hiragana, 1 for katakana
-    mode = 0
-
     def __init__(self):
         # Load the characters from a json file.
         with open(self.character_file, 'r', encoding="utf8") as f:
@@ -17,29 +14,40 @@ class Romaji:
         with open(self.word_file, 'r', encoding="utf8") as f:
             self.word_dict = json.load(f)
 
-    def get_kana(self, characters: [str]):
+    def get_characters(self, characters: [str], mode: int):
         output = ""
         for c in characters:
-            output += self.character_dict[c][self.mode]
+            output += self.character_dict[c][mode]
         return output
 
-    def random_word(self):
+    def get_random_word(self):
         # Choose a random word from the dict.
         random_word = random.choice(list(self.word_dict.keys()))
-        kana = self.get_kana(self.word_dict[random_word].split(" "))
-        answer = input(f"What is the romaji of {kana}? ").lower()
+        character = self.get_characters(self.word_dict[random_word].split(" "), 0)
 
-        if answer == random_word:
-            print("correct")
+        return self.get_answer(f"What is the romaji of {character}? ", random_word)
+
+    def get_random_character(self):
+        random_mode = random.randrange(0, 1)
+        random_character = random.choice(list(self.character_dict.keys()))
+        character = self.get_characters([random_character], random_mode)
+
+        return self.get_answer(f"What is the romaji of {character}? ", random_character)
+
+    def get_answer(self, prompt: str, result: str):
+        answer = input(prompt).lower()
+
+        if answer == result:
+            print("Correct")
             return True
         else:
-            print("incorrect")
+            print(f"Incorrect, the answer was {result}")
             return False
 
     def random_game(self, words=6):
         correct = 0
         for i in range(words):
-            if self.random_word():
+            if self.get_random_character():
                 correct += 1
         print(f"You got {correct}/{words} correct")
 
